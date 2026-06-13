@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>AsepStore</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { background: #0A0A0C; color: #fff; font-family: -apple-system, 'SF Pro Display', sans-serif; min-height: 100vh; }
+  header { display: flex; align-items: center; gap: 14px; padding: 28px 20px 18px; border-bottom: 1px solid #1A1A1E; }
+  header img { width: 46px; height: 46px; border-radius: 13px; object-fit: cover; box-shadow: 0 0 20px rgba(255,255,255,0.15); }
+  header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; text-shadow: 0 0 24px rgba(255,255,255,0.25); }
+  header p { font-size: 12px; color: #444; margin-top: 3px; }
+  .section-title { font-size: 11px; font-weight: 700; color: #3A3A3A; letter-spacing: 0.12em; padding: 22px 20px 12px; text-transform: uppercase; }
+  .app-list { padding: 0 12px 40px; }
+  .app-card {
+    display: flex; align-items: center; gap: 14px;
+    background: #111114; border-radius: 16px; padding: 14px; margin-bottom: 8px;
+    cursor: pointer; border: 1px solid #1C1C20; transition: all 0.15s; position: relative; overflow: hidden;
+  }
+  .app-card::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.025) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .app-card:active { transform: scale(0.985); background: #16161A; }
+  .app-icon-placeholder {
+    width: 54px; height: 54px; border-radius: 14px; background: #1C1C22;
+    display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  }
+  .app-info { flex: 1; min-width: 0; }
+  .app-name { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .app-short { font-size: 12px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .app-size { font-size: 11px; color: #2E2E2E; margin-top: 4px; }
+  .get-btn {
+    background: #17171F; color: #7777EE; border: 1px solid #25253A;
+    border-radius: 20px; padding: 7px 18px; font-size: 13px; font-weight: 700;
+    cursor: pointer; flex-shrink: 0; box-shadow: 0 0 12px rgba(80,80,255,0.12);
+    text-decoration: none; display: inline-block;
+  }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    z-index: 100; align-items: flex-end; backdrop-filter: blur(10px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #0E0E11; border-radius: 24px 24px 0 0; width: 100%;
+    max-height: 82vh; overflow-y: auto; border-top: 1px solid #222226;
+    animation: slideUp 0.22s cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 36px; height: 4px; background: #2A2A2E; border-radius: 2px; margin: 12px auto 0; }
+  .modal-header {
+    display: flex; align-items: center; gap: 16px; padding: 20px 20px 16px;
+    border-bottom: 1px solid #18181C; position: relative;
+  }
+  .modal-icon-placeholder {
+    width: 66px; height: 66px; border-radius: 18px; background: #1C1C22;
+    display: flex; align-items: center; justify-content: center; font-size: 30px;
+    flex-shrink: 0; box-shadow: 0 0 24px rgba(0,0,0,0.5);
+  }
+  .modal-title { font-size: 18px; font-weight: 800; }
+  .modal-subtitle { font-size: 12px; color: #444; margin-top: 3px; }
+  .modal-body { padding: 20px 20px 32px; }
+  .modal-desc { font-size: 14px; color: #888; line-height: 1.65; margin-bottom: 20px; }
+  .feature-list { margin-bottom: 26px; }
+  .feature-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .feature-dot { width: 5px; height: 5px; background: #6666FF; border-radius: 50%; margin-top: 7px; flex-shrink: 0; box-shadow: 0 0 8px rgba(80,80,255,0.7); }
+  .feature-text { font-size: 13px; color: #666; line-height: 1.5; }
+  .download-btn {
+    display: block; width: 100%; background: #FFFFFF; color: #000000;
+    border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 800;
+    cursor: pointer; text-align: center; text-decoration: none;
+    box-shadow: 0 0 40px rgba(255,255,255,0.12); transition: transform 0.1s;
+  }
+  .download-btn:active { transform: scale(0.98); }
+  .close-btn {
+    position: absolute; top: 18px; right: 18px; width: 28px; height: 28px;
+    background: #1E1E22; border: none; border-radius: 50%; color: #555;
+    font-size: 13px; font-weight: 700; cursor: pointer; display: flex;
+    align-items: center; justify-content: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="https://raw.githubusercontent.com/osnailcyargta-ctrl/asepstore/main/assets/icon.png" alt="AsepStore" onerror="this.style.display='none'">
+  <div>
+    <h1>AsepStore</h1>
+    <p>Apps built from scratch</p>
+  </div>
+</header>
+
+<div class="section-title">All Apps (2)</div>
+<div class="app-list" id="appList"></div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div id="modalIcon"></div>
+      <div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-subtitle" id="modalSubtitle"></div>
+      </div>
+      <button class="close-btn" onclick="hideModal()">x</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="feature-list" id="modalFeatures"></div>
+      <a class="download-btn" id="modalDownload" href="#">Download APK</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const BASE = "https://github.com/osnailcyargta-ctrl/asepstore/raw/main/apks/";
+
+const apps = [
+  {
+    name: "Desktop Pet",
+    short: "Overlay pet yang hidup di layar lo",
+    size: "2.6 MB",
+    emoji: "🐾",
+    apk: BASE + "desktop_pet.apk",
+    desc: "Pet virtual yang nongol di atas semua aplikasi lain. Bisa di-drag ke mana aja, dikasih makan, minum, atau ditidurin. Pas lagi tidur dan volume HP di atas 30%, dia bakal otomatis bangun setelah 4 detik.",
+    features: [
+      "Overlay di atas semua aplikasi",
+      "Drag bebas ke mana saja",
+      "Mode: Idle, Walk (gerak sendiri), Sleep",
+      "Auto bangun kalau volume lebih dari 30%",
+      "Ganti gambar pet dari galeri HP",
+      "Tombol X untuk tutup langsung dari layar"
+    ]
+  },
+  {
+    name: "Vault Gallery",
+    short: "Galeri dengan fitur foto tersembunyi",
+    size: "4.9 MB",
+    emoji: "🖼",
+    apk: BASE + "gallery.apk",
+    desc: "Galeri foto lengkap dengan fitur rahasia. Foto bisa disembunyikan pakai trik volume — nggak bakal keliatan sama orang lain. Bisa dijadikan aplikasi galeri default di HP.",
+    features: [
+      "Tampilkan semua foto dari galeri HP",
+      "Volume max + klik foto = foto disembunyikan",
+      "Volume max + brightness paling kecil = foto muncul lagi",
+      "Bisa dijadikan galeri default",
+      "Kompatibel Android dan HarmonyOS",
+      "Dark mode minimalis"
+    ]
+  }
+];
+
+function renderApps() {
+  const list = document.getElementById("appList");
+  apps.forEach((app, i) => {
+    list.innerHTML += `
+      <div class="app-card" onclick="openModal(${i})">
+        <div class="app-icon-placeholder">${app.emoji}</div>
+        <div class="app-info">
+          <div class="app-name">${app.name}</div>
+          <div class="app-short">${app.short}</div>
+          <div class="app-size">${app.size}</div>
+        </div>
+        <span class="get-btn">GET</span>
+      </div>`;
+  });
+}
+
+function openModal(i) {
+  const app = apps[i];
+  document.getElementById("modalIcon").innerHTML = `<div class="modal-icon-placeholder">${app.emoji}</div>`;
+  document.getElementById("modalTitle").textContent = app.name;
+  document.getElementById("modalSubtitle").textContent = app.size + " • APK";
+  document.getElementById("modalDesc").textContent = app.desc;
+  document.getElementById("modalDownload").href = app.apk;
+  document.getElementById("modalDownload").setAttribute("download", app.name + ".apk");
+  document.getElementById("modalFeatures").innerHTML =
+    app.features.map(f => `<div class="feature-item"><div class="feature-dot"></div><div class="feature-text">${f}</div></div>`).join("");
+  document.getElementById("modalOverlay").classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById("modalOverlay")) hideModal();
+}
+
+function hideModal() {
+  document.getElementById("modalOverlay").classList.remove("show");
+  document.body.style.overflow = "";
+}
+
+renderApps();
+</script>
+</body>
+</html>
