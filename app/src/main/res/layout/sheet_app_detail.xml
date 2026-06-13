@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="#0E0E11"
-    android:paddingBottom="32dp">
+    android:paddingBottom="36dp">
 
     <View android:layout_width="36dp" android:layout_height="4dp"
         android:background="#2A2A2E" android:layout_gravity="center_horizontal" android:layout_marginTop="12dp"/>
@@ -63,10 +63,10 @@
             android:id="@+id/sheet_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#888888"
+            android:textColor="#777777"
             android:textSize="14sp"
             android:lineSpacingMultiplier="1.5"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="14dp"/>
 
         <LinearLayout
             android:id="@+id/sheet_features"
@@ -74,6 +74,52 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginBottom="24dp"/>
+
+        <!-- Progress section - hidden until download starts -->
+        <LinearLayout
+            android:id="@+id/progress_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="14dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Downloading"
+                    android:textColor="#555555"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/progress_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textColor="#7777EE"
+                    android:textSize="12sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:max="100"
+                android:progress="0"
+                android:progressTint="#7777EE"
+                android:progressBackgroundTint="#1E1E28"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/btn_install"
@@ -85,5 +131,6 @@
             android:textSize="15sp"
             android:textStyle="bold"
             android:background="#FFFFFF"/>
+
     </LinearLayout>
 </LinearLayout>
