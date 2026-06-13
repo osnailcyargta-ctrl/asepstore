@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.AsepStore" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#FFFFFF</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="android:windowBackground">#0A0A0C</item>
+        <item name="android:statusBarColor">#0A0A0C</item>
+        <item name="android:navigationBarColor">#0A0A0C</item>
+    </style>
+</resources>
