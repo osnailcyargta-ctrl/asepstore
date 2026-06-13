@@ -25,7 +25,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2 apps"
+            android:text="3 apps"
             android:textColor="#333333"
             android:textSize="13sp"/>
     </LinearLayout>
