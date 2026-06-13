@@ -17,8 +17,17 @@ class DownloadService : Service() {
         const val ACTION_DOWNLOAD = "download"
         const val EXTRA_URL = "url"
         const val EXTRA_NAME = "name"
-        const val CHANNEL_ID = "download_channel"
-        const val NOTIF_ID = 42
+        const val EXTRA_APP_ID = "app_id"
+        const val CHANNEL_ID = "dl_ch"
+        const val NOTIF_ID = 77
+
+        // Broadcast actions
+        const val BROADCAST_PROGRESS = "com.asepstore.PROGRESS"
+        const val BROADCAST_DONE = "com.asepstore.DONE"
+        const val BROADCAST_ERROR = "com.asepstore.ERROR"
+        const val EXTRA_PROGRESS = "progress"
+        const val EXTRA_DOWNLOADED = "downloaded"
+        const val EXTRA_TOTAL = "total"
     }
 
     private val handler = Handler(Looper.getMainLooper())
@@ -28,42 +37,62 @@ class DownloadService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val url = intent?.getStringExtra(EXTRA_URL) ?: return START_NOT_STICKY
         val name = intent.getStringExtra(EXTRA_NAME) ?: "app"
+        val appId = intent.getIntExtra(EXTRA_APP_ID, 0)
         createChannel()
-        startForeground(NOTIF_ID, buildNotif(name, 0))
-        Thread { downloadAndInstall(url, name) }.start()
+        startForeground(NOTIF_ID, buildNotif(name, 0, true))
+        Thread { downloadAndInstall(url, name, appId) }.start()
         return START_NOT_STICKY
     }
 
-    private fun downloadAndInstall(urlStr: String, appName: String) {
+    private fun downloadAndInstall(urlStr: String, appName: String, appId: Int) {
         try {
             val cacheDir = File(cacheDir, "apk_cache").also { it.mkdirs() }
             val apkFile = File(cacheDir, "${appName.replace(" ", "_")}.apk")
 
             val url = URL(urlStr)
             val conn = url.openConnection() as HttpURLConnection
+            conn.instanceFollowRedirects = true
             conn.connect()
-            val total = conn.contentLength
+            val total = conn.contentLength.toLong()
             val input = BufferedInputStream(conn.inputStream)
             val output = FileOutputStream(apkFile)
 
             val buf = ByteArray(8192)
-            var downloaded = 0
+            var downloaded = 0L
             var read: Int
+            var lastBroadcast = 0
+
             while (input.read(buf).also { read = it } != -1) {
                 output.write(buf, 0, read)
                 downloaded += read
-                val progress = if (total > 0) (downloaded * 100 / total) else 0
-                updateNotif(appName, progress)
+                val progress = if (total > 0) (downloaded * 100 / total).toInt() else 0
+
+                if (progress != lastBroadcast) {
+                    lastBroadcast = progress
+                    // Broadcast to UI
+                    val i = Intent(BROADCAST_PROGRESS).apply {
+                        putExtra(EXTRA_APP_ID, appId)
+                        putExtra(EXTRA_PROGRESS, progress)
+                        putExtra(EXTRA_DOWNLOADED, downloaded)
+                        putExtra(EXTRA_TOTAL, total)
+                    }
+                    sendBroadcast(i)
+                    updateNotif(appName, progress, false)
+                }
             }
             output.close()
             input.close()
 
+            // Broadcast done
+            sendBroadcast(Intent(BROADCAST_DONE).apply { putExtra(EXTRA_APP_ID, appId) })
             handler.post { install(apkFile, appName) }
+
         } catch (e: Exception) {
-            handler.post {
-                showDoneNotif(appName, false)
-                stopSelf()
-            }
+            sendBroadcast(Intent(BROADCAST_ERROR).apply {
+                putExtra(EXTRA_APP_ID, appId)
+                putExtra("error", e.message)
+            })
+            stopSelf()
         }
     }
 
@@ -74,7 +103,6 @@ class DownloadService : Service() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
         startActivity(intent)
-        showDoneNotif(appName, true)
         stopSelf()
     }
 
@@ -85,33 +113,17 @@ class DownloadService : Service() {
         }
     }
 
-    private fun buildNotif(name: String, progress: Int): Notification {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+    private fun buildNotif(name: String, progress: Int, indeterminate: Boolean): Notification {
+        return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Downloading $name")
-            .setContentText(if (progress < 100) "$progress%" else "Installing...")
+            .setContentText(if (indeterminate) "Connecting..." else "$progress%")
             .setSmallIcon(android.R.drawable.stat_sys_download)
+            .setProgress(100, progress, indeterminate)
             .setOngoing(true)
-        if (progress in 1..99) {
-            builder.setProgress(100, progress, false)
-        } else if (progress == 0) {
-            builder.setProgress(100, 0, true)
-        }
-        return builder.build()
-    }
-
-    private fun updateNotif(name: String, progress: Int) {
-        val nm = getSystemService(NotificationManager::class.java)
-        nm.notify(NOTIF_ID, buildNotif(name, progress))
-    }
-
-    private fun showDoneNotif(name: String, success: Boolean) {
-        val nm = getSystemService(NotificationManager::class.java)
-        val notif = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(if (success) "$name siap diinstall" else "Download gagal")
-            .setContentText(if (success) "Tap untuk install" else "Coba lagi")
-            .setSmallIcon(if (success) android.R.drawable.stat_sys_download_done else android.R.drawable.stat_notify_error)
-            .setAutoCancel(true)
             .build()
-        nm.notify(NOTIF_ID + 1, notif)
+    }
+
+    private fun updateNotif(name: String, progress: Int, indeterminate: Boolean) {
+        getSystemService(NotificationManager::class.java).notify(NOTIF_ID, buildNotif(name, progress, indeterminate))
     }
 }
