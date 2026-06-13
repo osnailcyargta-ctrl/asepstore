@@ -9,7 +9,7 @@
   body { background: #0A0A0C; color: #fff; font-family: -apple-system, 'SF Pro Display', sans-serif; min-height: 100vh; }
   header { display: flex; align-items: center; gap: 14px; padding: 28px 20px 18px; border-bottom: 1px solid #1A1A1E; }
   header img { width: 46px; height: 46px; border-radius: 13px; object-fit: cover; box-shadow: 0 0 20px rgba(255,255,255,0.15); }
-  header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; text-shadow: 0 0 24px rgba(255,255,255,0.25); }
+  header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
   header p { font-size: 12px; color: #444; margin-top: 3px; }
   .section-title { font-size: 11px; font-weight: 700; color: #3A3A3A; letter-spacing: 0.12em; padding: 22px 20px 12px; text-transform: uppercase; }
   .app-list { padding: 0 12px 40px; }
@@ -20,26 +20,45 @@
   }
   .app-card::after {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.025) 0%, transparent 60%);
+    background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.02) 0%, transparent 60%);
     pointer-events: none;
   }
   .app-card:active { transform: scale(0.985); background: #16161A; }
-  .app-icon-placeholder {
+  .app-icon-wrap {
     width: 54px; height: 54px; border-radius: 14px; background: #1C1C22;
-    display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5); overflow: hidden;
   }
+  .app-icon-wrap svg { width: 28px; height: 28px; }
   .app-info { flex: 1; min-width: 0; }
   .app-name { font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .app-short { font-size: 12px; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .app-size { font-size: 11px; color: #2E2E2E; margin-top: 4px; }
-  .get-btn {
+
+  /* Buttons */
+  .btn-get {
     background: #17171F; color: #7777EE; border: 1px solid #25253A;
     border-radius: 20px; padding: 7px 18px; font-size: 13px; font-weight: 700;
-    cursor: pointer; flex-shrink: 0; box-shadow: 0 0 12px rgba(80,80,255,0.12);
-    text-decoration: none; display: inline-block;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .btn-open {
+    background: #1A2A1A; color: #4CAF50; border: 1px solid #2A3D2A;
+    border-radius: 20px; padding: 7px 18px; font-size: 13px; font-weight: 700;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .btn-installing {
+    background: #1A1A1A; color: #555; border: 1px solid #222;
+    border-radius: 20px; padding: 7px 18px; font-size: 13px; font-weight: 700;
+    cursor: default; flex-shrink: 0;
   }
 
+  /* Installed badge on card */
+  .installed-dot {
+    width: 7px; height: 7px; background: #4CAF50; border-radius: 50%;
+    position: absolute; top: 12px; right: 12px;
+  }
+
+  /* Modal */
   .modal-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
     z-index: 100; align-items: flex-end; backdrop-filter: blur(10px);
@@ -47,7 +66,7 @@
   .modal-overlay.show { display: flex; }
   .modal {
     background: #0E0E11; border-radius: 24px 24px 0 0; width: 100%;
-    max-height: 82vh; overflow-y: auto; border-top: 1px solid #222226;
+    max-height: 85vh; overflow-y: auto; border-top: 1px solid #222226;
     animation: slideUp 0.22s cubic-bezier(0.4,0,0.2,1);
   }
   @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
@@ -56,32 +75,59 @@
     display: flex; align-items: center; gap: 16px; padding: 20px 20px 16px;
     border-bottom: 1px solid #18181C; position: relative;
   }
-  .modal-icon-placeholder {
+  .modal-icon-wrap {
     width: 66px; height: 66px; border-radius: 18px; background: #1C1C22;
-    display: flex; align-items: center; justify-content: center; font-size: 30px;
-    flex-shrink: 0; box-shadow: 0 0 24px rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; box-shadow: 0 0 24px rgba(0,0,0,0.5); overflow: hidden;
   }
+  .modal-icon-wrap svg { width: 34px; height: 34px; }
   .modal-title { font-size: 18px; font-weight: 800; }
   .modal-subtitle { font-size: 12px; color: #444; margin-top: 3px; }
   .modal-body { padding: 20px 20px 32px; }
   .modal-desc { font-size: 14px; color: #888; line-height: 1.65; margin-bottom: 20px; }
   .feature-list { margin-bottom: 26px; }
   .feature-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-  .feature-dot { width: 5px; height: 5px; background: #6666FF; border-radius: 50%; margin-top: 7px; flex-shrink: 0; box-shadow: 0 0 8px rgba(80,80,255,0.7); }
+  .feature-dot { width: 5px; height: 5px; background: #6666FF; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
   .feature-text { font-size: 13px; color: #666; line-height: 1.5; }
-  .download-btn {
-    display: block; width: 100%; background: #FFFFFF; color: #000000;
-    border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 800;
-    cursor: pointer; text-align: center; text-decoration: none;
-    box-shadow: 0 0 40px rgba(255,255,255,0.12); transition: transform 0.1s;
-  }
-  .download-btn:active { transform: scale(0.98); }
   .close-btn {
     position: absolute; top: 18px; right: 18px; width: 28px; height: 28px;
     background: #1E1E22; border: none; border-radius: 50%; color: #555;
     font-size: 13px; font-weight: 700; cursor: pointer; display: flex;
     align-items: center; justify-content: center;
   }
+
+  /* Modal action buttons */
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-download-btn {
+    flex: 1; background: #FFFFFF; color: #000000;
+    border: none; border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 800;
+    cursor: pointer; text-align: center; text-decoration: none; display: block;
+    transition: transform 0.1s;
+  }
+  .modal-download-btn:active { transform: scale(0.98); }
+  .modal-download-btn.installed { background: #1A2A1A; color: #4CAF50; border: 1px solid #2A3D2A; }
+  .modal-uninstall-btn {
+    background: #2A1A1A; color: #EF5350; border: 1px solid #3D2A2A;
+    border-radius: 14px; padding: 16px 20px; font-size: 15px; font-weight: 800;
+    cursor: pointer; text-align: center; white-space: nowrap;
+  }
+  .modal-uninstall-btn:active { transform: scale(0.98); }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 18px; display: none; }
+  .progress-wrap.show { display: block; }
+  .progress-bar-bg { background: #1A1A1E; border-radius: 6px; height: 4px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: #7777EE; border-radius: 6px; transition: width 0.2s; width: 0%; }
+  .progress-label { font-size: 11px; color: #444; margin-top: 6px; text-align: center; }
+
+  /* Installed tag in modal */
+  .installed-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #1A2A1A; color: #4CAF50; border: 1px solid #2A3D2A;
+    border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .installed-tag svg { width: 10px; height: 10px; }
 </style>
 </head>
 <body>
@@ -94,24 +140,34 @@
   </div>
 </header>
 
-<div class="section-title">All Apps (2)</div>
+<div class="section-title" id="sectionTitle">All Apps (3)</div>
 <div class="app-list" id="appList"></div>
 
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal" id="modal">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div id="modalIcon"></div>
+      <div class="modal-icon-wrap" id="modalIcon"></div>
       <div>
         <div class="modal-title" id="modalTitle"></div>
         <div class="modal-subtitle" id="modalSubtitle"></div>
       </div>
-      <button class="close-btn" onclick="hideModal()">x</button>
+      <button class="close-btn" onclick="hideModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="modal-body">
+      <div id="installedTag" class="installed-tag" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Installed
+      </div>
       <div class="modal-desc" id="modalDesc"></div>
       <div class="feature-list" id="modalFeatures"></div>
-      <a class="download-btn" id="modalDownload" href="#">Download APK</a>
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">Downloading...</div>
+      </div>
+      <div class="modal-actions" id="modalActions"></div>
     </div>
   </div>
 </div>
@@ -119,12 +175,22 @@
 <script>
 const BASE = "https://github.com/osnailcyargta-ctrl/asepstore/raw/main/apks/";
 
+// Installed state stored in localStorage
+const STORAGE_KEY = "asepstore_installed";
+function getInstalled() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; }
+}
+function setInstalled(id, val) {
+  const d = getInstalled(); d[id] = val; localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+}
+function isInstalled(id) { return !!getInstalled()[id]; }
+
 const apps = [
   {
+    id: "desktop_pet",
     name: "Desktop Pet",
     short: "Overlay pet yang hidup di layar lo",
     size: "2.6 MB",
-    emoji: "🐾",
     apk: BASE + "desktop_pet.apk",
     desc: "Pet virtual yang nongol di atas semua aplikasi lain. Bisa di-drag ke mana aja, dikasih makan, minum, atau ditidurin. Pas lagi tidur dan volume HP di atas 30%, dia bakal otomatis bangun setelah 4 detik.",
     features: [
@@ -134,13 +200,14 @@ const apps = [
       "Auto bangun kalau volume lebih dari 30%",
       "Ganti gambar pet dari galeri HP",
       "Tombol X untuk tutup langsung dari layar"
-    ]
+    ],
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.5"><path d="M12 2C9 2 7 4 7 7c0 2 1 3.5 2.5 4.5C8 12.5 7 14 7 16c0 3 2 5 5 5s5-2 5-5c0-2-1-3.5-2.5-4.5C16 10.5 17 9 17 7c0-3-2-5-5-5z"/><circle cx="9.5" cy="7" r="1" fill="#A78BFA"/><circle cx="14.5" cy="7" r="1" fill="#A78BFA"/></svg>`
   },
   {
+    id: "vault_gallery",
     name: "Vault Gallery",
     short: "Galeri dengan fitur foto tersembunyi",
     size: "4.9 MB",
-    emoji: "🖼",
     apk: BASE + "gallery.apk",
     desc: "Galeri foto lengkap dengan fitur rahasia. Foto bisa disembunyikan pakai trik volume — nggak bakal keliatan sama orang lain. Bisa dijadikan aplikasi galeri default di HP.",
     features: [
@@ -150,47 +217,154 @@ const apps = [
       "Bisa dijadikan galeri default",
       "Kompatibel Android dan HarmonyOS",
       "Dark mode minimalis"
-    ]
+    ],
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`
+  },
+  {
+    id: "pixel_studio",
+    name: "Pixel Studio",
+    short: "Editor pixel art dengan touch support",
+    size: "2.5 MB",
+    apk: BASE + "pixel_studio.apk",
+    desc: "Editor pixel art lengkap yang bisa lo jalanin langsung di HP. Dibuat dari scratch dengan touch support penuh, grid canvas, dan berbagai tool menggambar. Cocok buat bikin sprite game atau aset pixel art.",
+    features: [
+      "Canvas grid dengan touch support penuh",
+      "Berbagai tool: pencil, fill, eraser, eyedropper",
+      "Palet warna kustom",
+      "Undo / redo",
+      "Export ke PNG",
+      "Zoom in/out dengan pinch gesture"
+    ],
+    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="1.5"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>`
   }
 ];
 
+let currentAppIndex = null;
+
 function renderApps() {
   const list = document.getElementById("appList");
+  list.innerHTML = "";
   apps.forEach((app, i) => {
+    const installed = isInstalled(app.id);
     list.innerHTML += `
       <div class="app-card" onclick="openModal(${i})">
-        <div class="app-icon-placeholder">${app.emoji}</div>
+        ${installed ? '<div class="installed-dot"></div>' : ''}
+        <div class="app-icon-wrap">${app.icon}</div>
         <div class="app-info">
           <div class="app-name">${app.name}</div>
           <div class="app-short">${app.short}</div>
           <div class="app-size">${app.size}</div>
         </div>
-        <span class="get-btn">GET</span>
+        ${installed
+          ? `<button class="btn-open" onclick="openApp(event, '${app.id}')">OPEN</button>`
+          : `<button class="btn-get">GET</button>`
+        }
       </div>`;
   });
 }
 
+function openApp(e, id) {
+  e.stopPropagation();
+  // On Android WebView this would launch intent; here we just show a toast
+  showToast("Buka " + apps.find(a => a.id === id).name + "...");
+}
+
 function openModal(i) {
+  currentAppIndex = i;
   const app = apps[i];
-  document.getElementById("modalIcon").innerHTML = `<div class="modal-icon-placeholder">${app.emoji}</div>`;
+  const installed = isInstalled(app.id);
+
+  document.getElementById("modalIcon").innerHTML = app.icon;
   document.getElementById("modalTitle").textContent = app.name;
-  document.getElementById("modalSubtitle").textContent = app.size + " • APK";
+  document.getElementById("modalSubtitle").textContent = app.size + " \u2022 APK";
   document.getElementById("modalDesc").textContent = app.desc;
-  document.getElementById("modalDownload").href = app.apk;
-  document.getElementById("modalDownload").setAttribute("download", app.name + ".apk");
   document.getElementById("modalFeatures").innerHTML =
     app.features.map(f => `<div class="feature-item"><div class="feature-dot"></div><div class="feature-text">${f}</div></div>`).join("");
+
+  document.getElementById("installedTag").style.display = installed ? "inline-flex" : "none";
+  document.getElementById("progressWrap").classList.remove("show");
+
+  renderModalActions(i, installed);
   document.getElementById("modalOverlay").classList.add("show");
   document.body.style.overflow = "hidden";
+}
+
+function renderModalActions(i, installed) {
+  const app = apps[i];
+  const actions = document.getElementById("modalActions");
+  if (installed) {
+    actions.innerHTML = `
+      <button class="modal-download-btn installed" style="flex:1" onclick="openApp(event, '${app.id}')">Open</button>
+      <button class="modal-uninstall-btn" onclick="uninstallApp(${i})">Uninstall</button>`;
+  } else {
+    actions.innerHTML = `
+      <a class="modal-download-btn" id="downloadBtn" href="${app.apk}" download="${app.name}.apk" onclick="onDownloadClick(${i})">Download APK</a>`;
+  }
+}
+
+function onDownloadClick(i) {
+  const app = apps[i];
+  // Simulate download progress, then mark as installed
+  const progressWrap = document.getElementById("progressWrap");
+  const fill = document.getElementById("progressFill");
+  const label = document.getElementById("progressLabel");
+  const actions = document.getElementById("modalActions");
+
+  progressWrap.classList.add("show");
+  actions.innerHTML = `<button class="modal-download-btn" style="background:#1A1A1A;color:#555;cursor:default">Downloading...</button>`;
+
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 18 + 5;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+      fill.style.width = "100%";
+      label.textContent = "Installing...";
+      setTimeout(() => {
+        progressWrap.classList.remove("show");
+        setInstalled(app.id, true);
+        document.getElementById("installedTag").style.display = "inline-flex";
+        renderModalActions(i, true);
+        renderApps();
+        label.textContent = "Downloading...";
+        fill.style.width = "0%";
+      }, 800);
+    } else {
+      fill.style.width = progress + "%";
+      label.textContent = "Downloading... " + Math.floor(progress) + "%";
+    }
+  }, 200);
+}
+
+function uninstallApp(i) {
+  const app = apps[i];
+  if (!confirm("Uninstall " + app.name + "?")) return;
+  setInstalled(app.id, false);
+  document.getElementById("installedTag").style.display = "none";
+  renderModalActions(i, false);
+  renderApps();
 }
 
 function closeModal(e) {
   if (e.target === document.getElementById("modalOverlay")) hideModal();
 }
-
 function hideModal() {
   document.getElementById("modalOverlay").classList.remove("show");
   document.body.style.overflow = "";
+  currentAppIndex = null;
+}
+
+function showToast(msg) {
+  const t = document.createElement("div");
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position:"fixed", bottom:"80px", left:"50%", transform:"translateX(-50%)",
+    background:"#1C1C22", color:"#aaa", padding:"10px 20px", borderRadius:"10px",
+    fontSize:"13px", zIndex:"999", border:"1px solid #2A2A30"
+  });
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
 }
 
 renderApps();
