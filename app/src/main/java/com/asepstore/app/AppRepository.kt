@@ -13,7 +13,7 @@ object AppRepository {
             version = "1.0",
             emoji = "DP",
             apkUrl = BASE + "desktop_pet.apk",
-            packageName = "com.osnailcyargta.desktoppet",
+            packageName = "com.desktoppet.app",
             features = listOf(
                 "Overlay di atas semua aplikasi",
                 "Drag bebas ke mana saja",
@@ -32,7 +32,7 @@ object AppRepository {
             version = "1.0",
             emoji = "VG",
             apkUrl = BASE + "gallery.apk",
-            packageName = "com.osnailcyargta.vaultgallery",
+            packageName = "com.vaultgallery.app",
             features = listOf(
                 "Tampilkan semua foto dari galeri HP",
                 "Volume max + klik foto = foto tersembunyi",
@@ -51,7 +51,7 @@ object AppRepository {
             version = "1.0",
             emoji = "PS",
             apkUrl = BASE + "pixel_studio.apk",
-            packageName = "com.osnailcyargta.pixelstudio",
+            packageName = "com.pixelstudio.app",
             features = listOf(
                 "Canvas grid dengan touch support penuh",
                 "Berbagai tool: pencil, fill, eraser, eyedropper",
