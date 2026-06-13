@@ -21,7 +21,7 @@
             android:layout_width="66dp"
             android:layout_height="66dp"
             android:gravity="center"
-            android:textSize="28sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
             android:background="#1C1C24"/>
@@ -75,7 +75,7 @@
             android:orientation="vertical"
             android:layout_marginBottom="24dp"/>
 
-        <!-- Progress section - hidden until download starts -->
+        <!-- Progress section -->
         <LinearLayout
             android:id="@+id/progress_container"
             android:layout_width="match_parent"
@@ -121,16 +121,58 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/btn_install"
+        <!-- Action container -->
+        <LinearLayout
+            android:id="@+id/action_container"
             android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:gravity="center"
-            android:text="Install"
-            android:textColor="#000000"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:background="#FFFFFF"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Install button (shown when not installed) -->
+            <TextView
+                android:id="@+id/btn_install"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:gravity="center"
+                android:text="Install"
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:background="#FFFFFF"
+                android:visibility="visible"/>
+
+            <!-- Open button (shown when installed) -->
+            <TextView
+                android:id="@+id/btn_open"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Open"
+                android:textColor="#4CAF50"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:background="#1A2A1A"
+                android:visibility="gone"/>
+
+            <!-- Uninstall button (shown when installed) -->
+            <TextView
+                android:id="@+id/btn_uninstall"
+                android:layout_width="wrap_content"
+                android:layout_height="54dp"
+                android:gravity="center"
+                android:text="Uninstall"
+                android:textColor="#EF5350"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:background="#2A1A1A"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginStart="10dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>
