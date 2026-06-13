@@ -9,5 +9,6 @@ data class AppItem(
     val version: String,
     val emoji: String,
     val apkUrl: String,
+    val packageName: String,
     val features: List<String>
 )
